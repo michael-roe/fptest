@@ -391,9 +391,11 @@ int run_test;
 	break;
 
       case OP_CFF:
+#if 0
 	printf("CFF: result_type = %d\n", result_type);
 	printf("CFF: description = %s\n", description);
 	printf("expected_double = %.12a\n", expected_double);
+#endif
 	switch (result_type)
 	{
 	  case TYPE_DOUBLE:
@@ -606,7 +608,7 @@ int opt;
       }
       else if (strncmp(cp, "b128", 4) == 0)
       {
-        printf("destination precision = 128\n");
+        /* printf("destination precision = 128\n"); */
 	result_type = TYPE_QUAD;
         cp += 4;
       }
@@ -711,6 +713,9 @@ int opt;
         op = OP_CFF;
 	cp += 3;
       }
+      else if (*cp == ' ')
+      {
+      }
       else
       {
 	fclose(gen_file);
@@ -723,6 +728,11 @@ int opt;
       {
         rounding = ROUNDING_RNE;
 	cp += 2;
+      }
+      else if (strncmp(cp, "-Inf", 4) == 0)
+      {
+        rounding = ROUNDING_DOWN;
+	cp += 4;
       }
       else
       {
@@ -1018,7 +1028,9 @@ int opt;
 	}
 	else if (result_type == TYPE_QUAD)
 	{
+#if 0
           printf("128 bit result in main()\n");
+#endif
 	  riscv_test(gen_file, result_type, op, f, f2, f3, expected_double, 0.0, expected_int, exceptions_raised, buff);
 	}
       }
