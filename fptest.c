@@ -289,6 +289,8 @@ unsigned int v;
 unsigned long long u;
 int run_test;
 
+  run_test = 1;
+
 #if 0
   if ((/* (op == OP_ADD) || (op == OP_SUB) || (op == OP_MUL) || (op == OP_DIV) || (op == OP_SQRT) || */ /* (op == OP_ABS) || (op == OP_NEG) || (op == OP_MAX) || (op == OP_ISFINITE) || (op == OP_ISNORMAL) || (op == OP_ISSIGNALLING) || (op == OP_FMA) )*/ ((result_type != TYPE_FLOAT) || (!isnan(expected))) && (op != OP_MAXMAG) && (op != OP_ISZERO) && (op != OP_ISSIGNED) && (op != OP_FMA) ) /* && (!is_signalling(f1)) && (!is_signalling(f2)) */ )
 #endif
@@ -940,7 +942,9 @@ int opt;
 	  else if ((f == 0) && (copysign(1.0, f) < 0))
 	    result_float = f2;
 	  else
+          {
             result_float = f;
+	  }
 	  break;
 	case OP_MAXMAG:
 	  result_float = fmaxf(f, f2);
@@ -972,7 +976,11 @@ int opt;
 	}
 	else if (result_type == TYPE_FLOAT)
         {
-          if ((memcmp((const void *) &result_float, (const void *) &expected_float, sizeof(float)) != 0) && (!isnan(result_float) || !isnan(expected_float)))
+	  if ((op == OP_MAXMAG) && (test_maxmag == 0))
+	  {
+            /* ignore OP_MAXMAG */
+          }
+	  else if ((memcmp((const void *) &result_float, (const void *) &expected_float, sizeof(float)) != 0) && (!isnan(result_float) || !isnan(expected_float)))
           {
             printf("FAIL %s", buff);
             printf("*** unexpected result %.8a != %.8a\n", expected_float, result_float);
