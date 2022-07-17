@@ -506,6 +506,12 @@ int run_test;
 }
 
 
+void write_end_of_tests(FILE *f)
+{
+  test_number++;
+  fprintf(f, "test%d:\n", test_number);
+}
+
 int main(int argc, char **argv)
 {
 static char buff[80];
@@ -573,7 +579,7 @@ int opt;
   }
   fprintf(gen_file, "\tla sp, _stack\n");
   fprintf(gen_file, "\tli a1, 1\n");
-  fprintf(gen_file, "\tla t0, _test\n");
+  fprintf(gen_file, "\tla t0, _tests\n");
   fprintf(gen_file, "\tjalr 0(t0)\n");
   fprintf(gen_file, "\tj _fail\n");
   fprintf(gen_file, "_tests:\n");
@@ -797,6 +803,7 @@ int opt;
         /* When we reach the table of constants that doesn't have a ->,
 	 * we've reached the end.
 	 */
+        write_end_of_tests(gen_file);
 	return 0;
       }
 
