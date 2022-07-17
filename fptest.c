@@ -322,6 +322,14 @@ int run_test;
     run_test = 0;
   }
 
+  if (isnan(f1) && (op == OP_NEG))
+  {
+    /* In IEEE 754:2008, Neg is non-arithmetic, so signalling nans
+     * won't raise an exception.
+     */
+    run_test = 0;
+  }
+
   if (op == OP_ISSIGNED)
   {
     run_test = 0;
