@@ -48,3 +48,6 @@ _start:
 	.global tohost
 tohost:
 	.dword 0
+	.global fromhost
+fromhost:
+	.dword 0
