@@ -19,6 +19,9 @@ stack.o: stack.s
 generated.o: generated.s
 	$(CLANG) $(CFLAGS) -c generated.s
 
+generated.s: ../fptest
+	../fptest < /home/mr101/git/fpgen/test-vectors.txt
+
 generated: init.o generated.o epilog.o stack.o
 	$(LD) $(LDFLAGS) -o generated init.o generated.o epilog.o stack.o
 
