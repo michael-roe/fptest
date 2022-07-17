@@ -339,6 +339,7 @@ int run_test;
     fprintf(gen_file, "\t# Test %d\n", test_number);
     fprintf(gen_file, "\t# %s\n", description);
     fprintf(gen_file, "\n");
+    fprintf(gen_file, "test%d:\n", test_number);
     v = *((unsigned int *) &f1);
     fprintf(gen_file, "\taddi a1, a1, 1\n");
     fprintf(gen_file, "\tli t0, 0x%x\t #%.8a\n", v, f1);
@@ -469,10 +470,9 @@ int run_test;
     {
       fprintf(gen_file, "\tcsrrw a2, fflags, zero\n");
       fprintf(gen_file, "\tli t0, 0x%x\n", exceptions_raised);
-      fprintf(gen_file, "\tbeq t0, a2, L%d\n", label_number);
+      fprintf(gen_file, "\tbeq t0, a2, test%da\n", test_number);
       fprintf(gen_file, "\tret\n");
-      fprintf(gen_file, "L%d:\n", label_number);
-      label_number++;
+      fprintf(gen_file, "test%da:\n", test_number);
     }
 
     switch (result_type)
@@ -499,10 +499,8 @@ int run_test;
 	break;
     }
 
-    fprintf(gen_file, "\tbeq t0, a0, L%d\n", label_number);
+    fprintf(gen_file, "\tbeq t0, a0, test%d\n", test_number + 1);
     fprintf(gen_file, "\tret\n");
-    fprintf(gen_file, "L%d:\n", label_number);
-    label_number++;
     fprintf(gen_file, "\n");
   }
 }
@@ -578,7 +576,7 @@ int opt;
   fprintf(gen_file, "\tla t0, _test\n");
   fprintf(gen_file, "\tjalr 0(t0)\n");
   fprintf(gen_file, "\tj _fail\n");
-  fprintf(gen_file, "_test:\n");
+  fprintf(gen_file, "_tests:\n");
 
   while (!feof(stdin))
   {
@@ -794,9 +792,17 @@ int opt;
         f3 = 0.0;
       }
 
+      if (*cp == 0)
+      {
+        /* When we reach the table of constants that doesn't have a ->,
+	 * we've reached the end.
+	 */
+	return 0;
+      }
+
       if (strncmp(cp, "->", 2) != 0)
       {
-        fprintf(stderr, "Expecting ->: %s\n", buff);
+        fprintf(stderr, "Expecting ->: %s (%s)\n", buff, cp);
 	return -1;
       }
       else
