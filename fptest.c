@@ -83,6 +83,7 @@
 #define TYPE_INT 4
 
 static int test_fma = 0;
+static int test_fma_only = 0;
 static int test_quad = 0;
 static int test_fcsr = 0;
 static int test_maxmag = 0;
@@ -322,6 +323,11 @@ int run_test;
     run_test = 0;
   }
 
+  if ((op != OP_FMA) && test_fma_only)
+  {
+    run_test = 0;
+  }
+
   if (isnan(f1) && (op == OP_NEG))
   {
     /* In IEEE 754:2008, Neg is non-arithmetic, so signalling nans
@@ -355,6 +361,12 @@ int run_test;
     v = *((unsigned int *) &f2);
     fprintf(gen_file, "\tli t0, 0x%x\t #%.8a\n", v, f2);
     fprintf(gen_file, "\tfmv.s.x f2, t0\n");
+    if (op == OP_FMA)
+    {
+      v = *((unsigned int *) &f3);
+      fprintf(gen_file, "\tli t0, 0x%x\t #%.8a\n", v, f3);
+      fprintf(gen_file, "\tfmv.s.x f3, t0\n");
+    }
 
     fprintf(gen_file, "\tcsrrci zero, fflags, 0x1f\n");
     switch (op)
@@ -555,6 +567,7 @@ int opt;
     {
       case 'F':
         test_fma = 1;
+	test_fma_only = 1;
 	break;
       case 'M':
 	test_maxmag = 1;
