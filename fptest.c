@@ -562,7 +562,7 @@ int raised;
 FILE *gen_file;
 int opt;
 
-  while ((opt = getopt(argc, argv, "Fcqs")) != -1)
+  while ((opt = getopt(argc, argv, "Fcmqs")) != -1)
   {
     switch (opt)
     {
@@ -575,6 +575,9 @@ int opt;
 	break;
       case 'c':
 	test_fcsr = 1;
+	break;
+      case 'm':
+	test_issigned_nan = 1;
 	break;
       case 'q':
 	test_quad = 1;
