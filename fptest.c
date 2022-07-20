@@ -89,6 +89,7 @@ static int test_fcsr = 0;
 static int test_maxmag = 0;
 static int test_signalling = 0;
 static int test_signalling_max = 0;
+static int test_issigned_nan = 0; /* isSigned is non-arithmetic in IEEE 745:2008 */
 
 static unsigned int signalling_nan = 0x7fa00000;
 
@@ -336,7 +337,7 @@ int run_test;
     run_test = 0;
   }
 
-  if (op == OP_ISSIGNED)
+  if (isnan(f1) && (op == OP_ISSIGNED) && (test_issigned_nan == 0))
   {
     run_test = 0;
   }
@@ -1005,7 +1006,11 @@ int opt;
       {
         if (result_is_int)
 	{
-	  if (result_int != expected_int)
+          if ((op == OP_ISSIGNED) && isnan(f) && (test_issigned_nan == 0))
+	  {
+            /* skip issigned(nan) */
+	  }
+	  else if (result_int != expected_int)
           {
 	    printf("FAIL %s", buff);
             printf("*** unexpected result %d != %d\n", expected_int, result_int);
