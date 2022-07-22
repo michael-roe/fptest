@@ -551,17 +551,32 @@ void hol_test(FILE *gen_file, int result_type, int op, float f1, float f2, float
 {
 int run_test = 1;
 
+  if ((op == OP_FMA) && (test_fma == 0))
+  {
+    run_test = 0;
+  }
+
+  if ((op != OP_FMA) && test_fma_only)
+  {
+    run_test = 0;
+  }
+
   if (run_test)
   {
-    fprintf(gen_file, "val f1 = ");
+    fprintf(gen_file, "(* %s *)\n", description);
+    fprintf(gen_file, "val f1 = ``");
     hol_float(gen_file, f1);
-    fprintf(gen_file, ";\n");
-    fprintf(gen_file, "val f2 = ");
+    fprintf(gen_file, "``;\n");
+    fprintf(gen_file, "val f2 = ``");
     hol_float(gen_file, f2);
-    fprintf(gen_file, ";\n");
-    fprintf(gen_file, "val f3 = ");
+    fprintf(gen_file, "``;\n");
+    fprintf(gen_file, "val f3 = ``");
     hol_float(gen_file, f3);
-    fprintf(gen_file, ";\n");
+    fprintf(gen_file, "``;\n");
+    fprintf(gen_file, "val expected = ``");
+    hol_float(gen_file, expected);
+    fprintf(gen_file, "``;\n");
+    fprintf(gen_file, "EVAL ``float_mul_add roundTiesToEven ^f1 ^f2 ^f3``;\n");
   }
 }
 
