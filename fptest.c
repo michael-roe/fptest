@@ -590,7 +590,17 @@ int run_test = 1;
     fprintf(gen_file, "val expected = ``");
     hol_float(gen_file, expected);
     fprintf(gen_file, "``;\n");
-    fprintf(gen_file, "EVAL ``float_equal ^expected (SND(float_mul_add roundTiesToEven ^f1 ^f2 ^f3))``;\n");
+    if (result_type == TYPE_FLOAT)
+    {
+      if (isnan(expected))
+      {
+        fprintf(gen_file, "EVAL ``float_is_nan (SND(float_mul_add roundTiesToEven ^f1 ^f2 ^f3))``;\n");
+      }
+      else
+      {
+        fprintf(gen_file, "EVAL ``float_equal ^expected (SND(float_mul_add roundTiesToEven ^f1 ^f2 ^f3))``;\n");
+      }
+    }
   }
 }
 
