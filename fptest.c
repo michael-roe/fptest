@@ -546,6 +546,20 @@ unsigned long l;
   fprintf(gen_file, "|> : (23,8)float");
 }
 
+void hol_preamble(FILE *gen_file)
+{
+  fprintf(gen_file, "load \"testutils\";\n");
+  fprintf(gen_file, "load \"bossLib\";\n");
+  fprintf(gen_file, "load \"binary_ieeeLib\";\n");
+  fprintf(gen_file, "load \"fp64Syntax\";\n");
+  fprintf(gen_file, "open HolKernel;\n");
+  fprintf(gen_file, "open boolLib;\n");
+  fprintf(gen_file, "open testutils;\n");
+  fprintf(gen_file, "open bossLib;\n");
+  fprintf(gen_file, "open binary_ieeeLib;\n");
+  fprintf(gen_file, "\n");
+}
+
 void hol_test(FILE *gen_file, int result_type, int op, float f1, float f2, float f3, double expected_double, float expected,
   int expected_int, int exceptions_raised , char *description)
 {
@@ -576,7 +590,7 @@ int run_test = 1;
     fprintf(gen_file, "val expected = ``");
     hol_float(gen_file, expected);
     fprintf(gen_file, "``;\n");
-    fprintf(gen_file, "EVAL ``float_mul_add roundTiesToEven ^f1 ^f2 ^f3``;\n");
+    fprintf(gen_file, "EVAL ``float_equal ^expected (SND(float_mul_add roundTiesToEven ^f1 ^f2 ^f3))``;\n");
   }
 }
 
@@ -663,6 +677,7 @@ int opt;
     fprintf(stderr, "Couldn't write to generated.sml\n");
     return -1;
   }
+  hol_preamble(hol_file);
 
   while (!feof(stdin))
   {
