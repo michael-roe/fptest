@@ -533,6 +533,38 @@ void write_end_of_tests(FILE *f)
   fprintf(f, "test%d:\n", test_number);
 }
 
+void hol_float(FILE *gen_file, float f)
+{
+unsigned long l;
+
+  l = *((unsigned long*) &f);
+
+  fprintf(gen_file, "<| ");
+  fprintf(gen_file, "Sign := %dw; ", (l & 0x80000000) ? 1 : 0);
+  fprintf(gen_file, "Exponent := %ldw; ", (l >> 23) & 0xff);
+  fprintf(gen_file, "Significand := 0x%lxw ", (l & 0x7fffff));
+  fprintf(gen_file, "|> : (23,8)float");
+}
+
+void hol_test(FILE *gen_file, int result_type, int op, float f1, float f2, float f3, double expected_double, float expected,
+  int expected_int, int exceptions_raised , char *description)
+{
+int run_test = 1;
+
+  if (run_test)
+  {
+    fprintf(gen_file, "val f1 = ");
+    hol_float(gen_file, f1);
+    fprintf(gen_file, ";\n");
+    fprintf(gen_file, "val f2 = ");
+    hol_float(gen_file, f2);
+    fprintf(gen_file, ";\n");
+    fprintf(gen_file, "val f3 = ");
+    hol_float(gen_file, f3);
+    fprintf(gen_file, ";\n");
+  }
+}
+
 int main(int argc, char **argv)
 {
 static char buff[80];
@@ -560,6 +592,7 @@ double d2;
 double d3;
 int raised;
 FILE *gen_file;
+FILE *hol_file;
 int opt;
 
   while ((opt = getopt(argc, argv, "Fcmqs")) != -1)
@@ -608,6 +641,13 @@ int opt;
   fprintf(gen_file, "\tjalr 0(t0)\n");
   fprintf(gen_file, "\tj _fail\n");
   fprintf(gen_file, "_tests:\n");
+
+  hol_file = fopen("generated.sml", "w");
+  if (hol_file == NULL)
+  {
+    fprintf(stderr, "Couldn't write to generated.sml\n");
+    return -1;
+  }
 
   while (!feof(stdin))
   {
@@ -1051,6 +1091,7 @@ int opt;
 	  else
 	  {
 	    riscv_test(gen_file, result_type, op, f, f2, f3, 0.0, expected_float, expected_int, exceptions_raised, buff);
+	    hol_test(hol_file, result_type, op, f, f2, f3, 0.0, expected_float, expected_int, exceptions_raised, buff);
 	  }
 	}
         else if (result_type == TYPE_DOUBLE)
