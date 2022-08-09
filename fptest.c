@@ -578,6 +578,7 @@ int run_test = 1;
   if (run_test)
   {
     fprintf(gen_file, "(* %s *)\n", description);
+    fprintf(gen_file, "tprint(\"%s\");\n", description);
     fprintf(gen_file, "val f1 = ``");
     hol_float(gen_file, f1);
     fprintf(gen_file, "``;\n");
@@ -599,6 +600,10 @@ int run_test = 1;
       else
       {
         fprintf(gen_file, "EVAL ``float_equal ^expected (SND(float_mul_add roundTiesToEven ^f1 ^f2 ^f3))``;\n");
+        if (expected == 0.0)
+        {
+          fprintf(gen_file, "EVAL ``%dw = (SND(float_mul_add roundTiesToEven ^f1 ^f2 ^f3)).Sign``;\n", (copysign(1.0, expected) < 0.0) ? 1 : 0);
+        }
       }
     }
   }
@@ -633,6 +638,7 @@ int raised;
 FILE *gen_file;
 FILE *hol_file;
 int opt;
+int len;
 
   while ((opt = getopt(argc, argv, "Fcmqs")) != -1)
   {
@@ -693,6 +699,11 @@ int opt;
   {
     buff[1] = 42;
     fgets(buff, sizeof(buff), stdin);
+    len = strlen(buff);
+    if ((len > 0) && (buff[len - 1] == '\n'))
+    {
+       buff[len - 1] = '\0';
+    }
     /* printf("*** %s", buff);  */
 
     if (buff[0] != '\n')
